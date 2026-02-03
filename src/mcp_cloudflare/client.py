@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import os
-
 import httpx
+
+from mcp_cloudflare.config import get_settings
 
 
 class CloudflareClient:
     """Manages httpx client for Cloudflare API v4.
 
-    Reads credentials from environment variables:
+    Reads credentials from environment variables or .env file via Pydantic Settings:
     - CLOUDFLARE_API_TOKEN
     - CLOUDFLARE_ACCOUNT_ID (optional, for tunnel operations)
     """
@@ -22,8 +22,9 @@ class CloudflareClient:
         api_token: str | None = None,
         account_id: str | None = None,
     ) -> None:
-        self.api_token = (api_token or os.environ.get("CLOUDFLARE_API_TOKEN", "")).strip()
-        self.account_id = (account_id or os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")).strip()
+        settings = get_settings()
+        self.api_token = (api_token or settings.api_token).strip()
+        self.account_id = (account_id or settings.account_id).strip()
 
     def _headers(self) -> dict[str, str]:
         return {
