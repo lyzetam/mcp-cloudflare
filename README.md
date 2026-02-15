@@ -53,10 +53,22 @@ pip install ".[all]"
 
 All settings are read from environment variables with the `CLOUDFLARE_` prefix, or from a `.env` file.
 
+### Authentication Methods
+
+The server supports **two authentication methods** (Global API Key is preferred):
+
+**Option 1: Global API Key** (Full Permissions - Recommended)
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CLOUDFLARE_EMAIL` | Cloudflare account email | `""` |
+| `CLOUDFLARE_API_KEY` | Cloudflare Global API Key | `""` |
+
+**Option 2: Scoped API Token** (Limited Permissions)
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token | `""` |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID | `""` |
+
+**Note:** If both methods are configured, Global API Key takes priority. For full functionality including zone creation, use the Global API Key method.
 
 ## Quick Start
 
@@ -88,9 +100,22 @@ mcp-cloudflare
 
 ### `.env` example
 
+**Using Global API Key (recommended for full access):**
+```env
+CLOUDFLARE_EMAIL=your-email@example.com
+CLOUDFLARE_API_KEY=your-global-api-key
+```
+
+**Using Scoped API Token:**
 ```env
 CLOUDFLARE_API_TOKEN=your-api-token
-CLOUDFLARE_ACCOUNT_ID=your-account-id
+```
+
+**Using both (Global API Key will be preferred):**
+```env
+CLOUDFLARE_EMAIL=your-email@example.com
+CLOUDFLARE_API_KEY=your-global-api-key
+CLOUDFLARE_API_TOKEN=your-api-token
 ```
 
 ## License

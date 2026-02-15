@@ -12,17 +12,30 @@ import httpx
 
 # Configuration from environment (strip to handle trailing newlines from Docker secrets)
 CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
+CLOUDFLARE_EMAIL = os.environ.get("CLOUDFLARE_EMAIL", "").strip()
+CLOUDFLARE_API_KEY = os.environ.get("CLOUDFLARE_API_KEY", "").strip()
 CLOUDFLARE_API_URL = "https://api.cloudflare.com/client/v4"
 
 mcp = FastMCP("cloudflare-mcp")
 
 
 def get_headers() -> dict:
-    """Get headers for Cloudflare API requests."""
-    return {
-        "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
-        "Content-Type": "application/json"
-    }
+    """Get headers for Cloudflare API requests.
+
+    Supports two auth methods:
+    1. API Token (scoped): CLOUDFLARE_API_TOKEN
+    2. Global API Key: CLOUDFLARE_EMAIL + CLOUDFLARE_API_KEY
+    """
+    headers = {"Content-Type": "application/json"}
+
+    # Prefer Global API Key if both email and key are provided
+    if CLOUDFLARE_EMAIL and CLOUDFLARE_API_KEY:
+        headers["X-Auth-Email"] = CLOUDFLARE_EMAIL
+        headers["X-Auth-Key"] = CLOUDFLARE_API_KEY
+    elif CLOUDFLARE_API_TOKEN:
+        headers["Authorization"] = f"Bearer {CLOUDFLARE_API_TOKEN}"
+
+    return headers
 
 
 def make_request(method: str, endpoint: str, data: Optional[dict] = None) -> dict:
